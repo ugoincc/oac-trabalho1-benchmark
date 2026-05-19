@@ -1,0 +1,24 @@
+RELATÓRIO DE BENCHMARK - THROUGHPUT DE MEMÓRIA
+========================================================================
+
+=== ESPECIFICAÇÕES DO SISTEMA ===
+SO:        Windows_NT 10.0.26200 (x64)
+CPU:       12th Gen Intel(R) Core(TM) i5-1240P
+Núcleos:   16 lógicos
+RAM Total: 15,73 GB
+RAM Livre: 4,06 GB
+=================================
+
+Config: 5 execuções por tamanho, 1 warmup
+Método: inversão de cores (leitura + escrita do buffer inteiro)
+
+========================================================================
+RESUMO DE THROUGHPUT POR NÍVEL DE CACHE
+========================================================================
+Tamanho              | Throughput Médio  | DP           | Mínimo       | Máximo
+------------------------------------------------------------------------
+32 KB  (L1 cache)    | 3,73 GB/s         | ±0,03 GB/s   | 3,69 GB/s    | 3,76 GB/s
+512 KB (L2 cache)    | 3,57 GB/s         | ±0,15 GB/s   | 3,32 GB/s    | 3,74 GB/s
+8 MB   (L3 cache)    | 3,54 GB/s         | ±0,08 GB/s   | 3,41 GB/s    | 3,63 GB/s
+128 MB (RAM)         | 3,25 GB/s         | ±0,15 GB/s   | 2,99 GB/s    | 3,41 GB/s
+------------------------------------------------------------------------

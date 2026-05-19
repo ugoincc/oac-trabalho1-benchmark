@@ -1,0 +1,32 @@
+RELATÓRIO DE PERFORMANCE - MEMÓRIA
+===================================
+
+=== ESPECIFICAÇÕES DO SISTEMA ===
+SO:           Windows_NT 10.0.26200 (x64)
+CPU:          12th Gen Intel(R) Core(TM) i5-1240P
+Núcleos:      16 lógicos
+RAM Total:    15,73 GB
+RAM Livre:    3,79 GB
+=================================
+
+=== RELATÓRIO: Inversão de Cores ===
+Data: 2026-05-19T15:22:18.123Z
+Config: 3 execuções, 2 warmups
+
+Run 1: 60,5583 ms | heap delta: 12,90 KB
+Run 2: 53,0229 ms | heap delta: 12,90 KB
+Run 3: 63,9355 ms | heap delta: 13,13 KB
+
+--- RESULTADOS FINAIS (Inversão de Cores) ---
+[TEMPO]
+  Média:         59,1722 ms
+  Desvio Padrão: ±4,5616 ms
+  Mínimo:        53,0229 ms
+  Máximo:        63,9355 ms
+[MEMÓRIA (heap delta)]
+  Média:         12,9740 KB
+  Desvio Padrão: ±0,1068 KB
+  Mínimo:        12,8984 KB
+  Máximo:        13,1250 KB
+-----------------------------------
+

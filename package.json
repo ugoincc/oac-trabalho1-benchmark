@@ -8,7 +8,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "blur": "node ./src/tests/sequentialRunner.js",
+    "memory": "node ./src/tests/memoryRunner.js",
+    "benchmark": "node ./src/tests/benchmarkRunner.js"
   },
   "dependencies": {
     "pngjs": "^7.0.0"

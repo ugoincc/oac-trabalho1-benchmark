@@ -1,4 +1,5 @@
 import fs from "fs";
+import os from "os";
 import path from "path";
 import { fileURLToPath } from "url";
 import { runSequentialBlur } from "../functions/mainBlur.js";
@@ -9,15 +10,18 @@ const RUNS = 3;
 const WARMUP = 2;
 const REPORT_FILE = path.join(__dirname, "relatorio_sequencial.txt");
 
+const fmt = (n, d = 4) =>
+  n.toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
+
 function getStats(arr) {
   const n = arr.length;
   const mean = arr.reduce((a, b) => a + b, 0) / n;
   const variance = arr.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / n;
   return {
-    mean: mean.toFixed(4),
-    stdDev: Math.sqrt(variance).toFixed(4),
-    min: Math.min(...arr).toFixed(4),
-    max: Math.max(...arr).toFixed(4),
+    mean: fmt(mean),
+    stdDev: fmt(Math.sqrt(variance)),
+    min: fmt(Math.min(...arr)),
+    max: fmt(Math.max(...arr)),
   };
 }
 
@@ -42,8 +46,8 @@ async function runTest(testName, testFunction) {
     process.stdout.write(`Execução ${i + 1}/${RUNS}... `);
     const duration = await testFunction(true); // true para silent mode
     times.push(duration);
-    console.log(`${duration.toFixed(2)} ms`);
-    logContent += `Run ${i + 1}: ${duration.toFixed(4)} ms\n`;
+    console.log(`${fmt(duration, 2)} ms`);
+    logContent += `Run ${i + 1}: ${fmt(duration)} ms\n`;
   }
 
   // Estatísticas
@@ -62,11 +66,25 @@ async function runTest(testName, testFunction) {
   return logContent;
 }
 
-async function main() {
-  // Limpa o arquivo de relatório anterior
+function getSystemSpecs() {
+  const cpus = os.cpus();
+  const cpu = cpus[0];
+  return (
+    `=== ESPECIFICAÇÕES DO SISTEMA ===\n` +
+    `SO:           ${os.type()} ${os.release()} (${os.arch()})\n` +
+    `CPU:          ${cpu.model.trim()}\n` +
+    `Núcleos:      ${cpus.length} lógicos\n` +
+    `RAM Total:    ${fmt(os.totalmem() / 1024 ** 3, 2)} GB\n` +
+    `RAM Livre:    ${fmt(os.freemem() / 1024 ** 3, 2)} GB\n` +
+    `=================================\n\n`
+  );
+}
+
+export async function main() {
   fs.writeFileSync(
     REPORT_FILE,
-    "RELATÓRIO DE PERFORMANCE SEQUENCIAL\n===================================\n"
+    "RELATÓRIO DE PERFORMANCE SEQUENCIAL\n===================================\n\n" +
+    getSystemSpecs()
   );
 
   try {
@@ -80,4 +98,6 @@ async function main() {
   }
 }
 
-main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}
