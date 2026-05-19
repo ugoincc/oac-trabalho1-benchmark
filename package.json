@@ -1,0 +1,16 @@
+{
+  "name": "trabalho-oac-1",
+  "version": "1.0.0",
+  "description": "Trabalho CPU / Memory Intensive Test",
+  "license": "ISC",
+  "author": "@ugoincc",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "pngjs": "^7.0.0"
+  }
+}

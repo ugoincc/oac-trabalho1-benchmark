@@ -1,0 +1,17 @@
+RELATÓRIO DE PERFORMANCE SEQUENCIAL
+===================================
+=== RELATÓRIO: Blur Sequencial ===
+Data: 2026-05-19T14:31:16.127Z
+Config: 3 execuções, 2 warmups
+
+Run 1: 9178.6443 ms
+Run 2: 9041.5316 ms
+Run 3: 8923.8574 ms
+
+--- RESULTADOS FINAIS (Blur Sequencial) ---
+Média:         9048.0111 ms
+Desvio Padrão: ±104.1172 ms
+Mínimo:        8923.8574 ms
+Máximo:        9178.6443 ms
+-----------------------------------
+
