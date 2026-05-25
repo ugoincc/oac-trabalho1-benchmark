@@ -1,4 +1,4 @@
 node_modules/
 assets/*
-outputs/*
-inputs/*
+src/outputs/*
+src/inputs/*
