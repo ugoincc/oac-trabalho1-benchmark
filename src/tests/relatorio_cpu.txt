@@ -1,0 +1,27 @@
+RELATÓRIO - PROGRAMA CPU-BOUND (Convolução Gaussiana)
+======================================================
+
+=== ESPECIFICAÇÕES DO SISTEMA ===
+SO:        Linux 6.14.0-37-generic (x64)
+CPU:       12th Gen Intel(R) Core(TM) i5-1240P
+Núcleos:   16 lógicos
+RAM Total: 15,35 GB
+=================================
+
+Imagem sintética: 2000x1500px, kernel 9x9
+Kernel: 9x9, sigma=3
+Config: 5 execuções, 2 warmups
+Ferramenta: process.cpuUsage() — tempo de CPU em modo usuário
+
+Run 1: 1.506,3540 ms
+Run 2: 1.473,2900 ms
+Run 3: 1.600,6030 ms
+Run 4: 1.511,1280 ms
+Run 5: 1.436,7080 ms
+--- RESULTADOS FINAIS ---
+[TEMPO DE CPU]
+  Média:         1.505,6166 ms
+  Desvio Padrão: ±54,4917 ms
+  Mínimo:        1.436,7080 ms
+  Máximo:        1.600,6030 ms
+-------------------------

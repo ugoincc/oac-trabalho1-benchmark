@@ -1,32 +1,64 @@
-RELATÓRIO DE PERFORMANCE - MEMÓRIA
-===================================
+RELATÓRIO - PROGRAMA MEMORY-BOUND (Throughput de Memória)
+==========================================================
 
 === ESPECIFICAÇÕES DO SISTEMA ===
-SO:           Windows_NT 10.0.26200 (x64)
-CPU:          12th Gen Intel(R) Core(TM) i5-1240P
-Núcleos:      16 lógicos
-RAM Total:    15,73 GB
-RAM Livre:    3,79 GB
+SO:        Linux 6.14.0-37-generic (x64)
+CPU:       12th Gen Intel(R) Core(TM) i5-1240P
+Núcleos:   16 lógicos
+RAM Total: 15,35 GB
 =================================
 
-=== RELATÓRIO: Inversão de Cores ===
-Data: 2026-05-19T15:22:18.123Z
-Config: 3 execuções, 2 warmups
+Config: 5 execuções por tamanho, 1 warmup
+Método: inversão de cores (leitura + escrita do buffer inteiro)
+Ferramenta: process.cpuUsage() — tempo de CPU em modo usuário
 
-Run 1: 60,5583 ms | heap delta: 12,90 KB
-Run 2: 53,0229 ms | heap delta: 12,90 KB
-Run 3: 63,9355 ms | heap delta: 13,13 KB
+========================================================================
+DETALHES POR NÍVEL DE CACHE
+========================================================================
 
---- RESULTADOS FINAIS (Inversão de Cores) ---
-[TEMPO]
-  Média:         59,1722 ms
-  Desvio Padrão: ±4,5616 ms
-  Mínimo:        53,0229 ms
-  Máximo:        63,9355 ms
-[MEMÓRIA (heap delta)]
-  Média:         12,9740 KB
-  Desvio Padrão: ±0,1068 KB
-  Mínimo:        12,8984 KB
-  Máximo:        13,1250 KB
------------------------------------
+--- 32 KB  (L1 cache) ---
+  Run 1: 115,50 ms (CPU) → 2,84 GB/s
+  Run 2: 116,67 ms (CPU) → 2,81 GB/s
+  Run 3: 121,68 ms (CPU) → 2,69 GB/s
+  Run 4: 118,86 ms (CPU) → 2,76 GB/s
+  Run 5: 118,86 ms (CPU) → 2,76 GB/s
+[TEMPO DE CPU] Média: 118,31 ms  ±2,12 ms  Min: 115,50 ms  Max: 121,68 ms
+[THROUGHPUT]   Média: 2,77 GB/s  ±0,05 GB/s  Min: 2,69 GB/s  Max: 2,84 GB/s
 
+--- 512 KB (L2 cache) ---
+  Run 1: 188,46 ms (CPU) → 2,78 GB/s
+  Run 2: 187,60 ms (CPU) → 2,79 GB/s
+  Run 3: 191,78 ms (CPU) → 2,73 GB/s
+  Run 4: 188,33 ms (CPU) → 2,78 GB/s
+  Run 5: 187,42 ms (CPU) → 2,80 GB/s
+[TEMPO DE CPU] Média: 188,72 ms  ±1,58 ms  Min: 187,42 ms  Max: 191,78 ms
+[THROUGHPUT]   Média: 2,78 GB/s  ±0,02 GB/s  Min: 2,73 GB/s  Max: 2,80 GB/s
+
+--- 8 MB   (L3 cache) ---
+  Run 1: 312,81 ms (CPU) → 2,68 GB/s
+  Run 2: 313,06 ms (CPU) → 2,68 GB/s
+  Run 3: 341,44 ms (CPU) → 2,46 GB/s
+  Run 4: 314,77 ms (CPU) → 2,66 GB/s
+  Run 5: 328,59 ms (CPU) → 2,55 GB/s
+[TEMPO DE CPU] Média: 322,13 ms  ±11,30 ms  Min: 312,81 ms  Max: 341,44 ms
+[THROUGHPUT]   Média: 2,61 GB/s  ±0,09 GB/s  Min: 2,46 GB/s  Max: 2,68 GB/s
+
+--- 128 MB (RAM) ---
+  Run 1: 324,82 ms (CPU) → 2,48 GB/s
+  Run 2: 296,92 ms (CPU) → 2,71 GB/s
+  Run 3: 302,19 ms (CPU) → 2,66 GB/s
+  Run 4: 295,28 ms (CPU) → 2,73 GB/s
+  Run 5: 346,92 ms (CPU) → 2,32 GB/s
+[TEMPO DE CPU] Média: 313,22 ms  ±19,90 ms  Min: 295,28 ms  Max: 346,92 ms
+[THROUGHPUT]   Média: 2,58 GB/s  ±0,16 GB/s  Min: 2,32 GB/s  Max: 2,73 GB/s
+
+========================================================================
+RESUMO — THROUGHPUT POR NÍVEL DE CACHE
+========================================================================
+Tamanho              | CPU Médio      | Throughput Médio  | DP           | Mínimo       | Máximo
+------------------------------------------------------------------------
+32 KB  (L1 cache)    | 118,31 ms      | 2,77 GB/s         | ±0,05 GB/s   | 2,69 GB/s    | 2,84 GB/s
+512 KB (L2 cache)    | 188,72 ms      | 2,78 GB/s         | ±0,02 GB/s   | 2,73 GB/s    | 2,80 GB/s
+8 MB   (L3 cache)    | 322,13 ms      | 2,61 GB/s         | ±0,09 GB/s   | 2,46 GB/s    | 2,68 GB/s
+128 MB (RAM)         | 313,22 ms      | 2,58 GB/s         | ±0,16 GB/s   | 2,32 GB/s    | 2,73 GB/s
+------------------------------------------------------------------------

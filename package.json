@@ -8,9 +8,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./src/index.js",
-    "blur": "node ./src/tests/sequentialRunner.js",
-    "memory": "node ./src/tests/memoryRunner.js",
-    "benchmark": "node ./src/tests/benchmarkRunner.js"
+    "cpu": "node ./src/tests/cpuRunner.js",
+    "memory": "node ./src/tests/memoryRunner.js"
   },
   "dependencies": {
     "pngjs": "^7.0.0"

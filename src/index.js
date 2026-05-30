@@ -1,11 +1,9 @@
-import { main as runBlurTests      } from "./tests/sequentialRunner.js";
-import { main as runMemoryTests    } from "./tests/memoryRunner.js";
-import { main as runBenchmarkTests } from "./tests/benchmarkRunner.js";
+import { main as runCpu } from './tests/cpuRunner.js';
+import { main as runMemory } from './tests/memoryRunner.js';
 
-console.log("=== INICIANDO TODOS OS TESTES ===\n");
+console.log('=== INICIANDO TODOS OS TESTES ===\n');
 
-await runBlurTests();
-await runMemoryTests();
-await runBenchmarkTests();
+await runCpu();
+await runMemory();
 
-console.log("\n=== TODOS OS TESTES CONCLUÍDOS ===");
+console.log('\n=== TODOS OS TESTES CONCLUÍDOS ===');

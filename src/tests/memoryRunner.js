@@ -1,107 +1,122 @@
-import fs from "fs";
-import os from "os";
-import path from "path";
-import { fileURLToPath } from "url";
-import { runInvertColors } from "../functions/mainInvert.js";
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { SIZES, runMemoryBound } from '../functions/memoryBound.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const RUNS = 5;
+const WARMUP = 1;
+const REPORT_FILE = path.join(__dirname, 'relatorio_memoria.txt');
 
-const RUNS = 3;
-const WARMUP = 2;
-const REPORT_FILE = path.join(__dirname, "relatorio_memoria.txt");
-
-const fmt = (n, d = 4) =>
-  n.toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
+const fmt = (n, d = 2) =>
+  n.toLocaleString('pt-BR', {
+    minimumFractionDigits: d,
+    maximumFractionDigits: d,
+  });
 
 function getStats(arr) {
-  const n = arr.length;
-  const mean = arr.reduce((a, b) => a + b, 0) / n;
-  const variance = arr.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / n;
+  const mean = arr.reduce((a, b) => a + b, 0) / arr.length;
+  const variance = arr.reduce((a, b) => a + (b - mean) ** 2, 0) / arr.length;
   return {
-    mean: fmt(mean),
-    stdDev: fmt(Math.sqrt(variance)),
-    min: fmt(Math.min(...arr)),
-    max: fmt(Math.max(...arr)),
+    mean,
+    stdDev: Math.sqrt(variance),
+    min: Math.min(...arr),
+    max: Math.max(...arr),
   };
 }
 
 function getSystemSpecs() {
   const cpus = os.cpus();
-  const cpu = cpus[0];
   return (
     `=== ESPECIFICAÇÕES DO SISTEMA ===\n` +
-    `SO:           ${os.type()} ${os.release()} (${os.arch()})\n` +
-    `CPU:          ${cpu.model.trim()}\n` +
-    `Núcleos:      ${cpus.length} lógicos\n` +
-    `RAM Total:    ${fmt(os.totalmem() / 1024 ** 3, 2)} GB\n` +
-    `RAM Livre:    ${fmt(os.freemem() / 1024 ** 3, 2)} GB\n` +
+    `SO:        ${os.type()} ${os.release()} (${os.arch()})\n` +
+    `CPU:       ${cpus[0].model.trim()}\n` +
+    `Núcleos:   ${cpus.length} lógicos\n` +
+    `RAM Total: ${fmt(os.totalmem() / 1024 ** 3)} GB\n` +
     `=================================\n\n`
   );
 }
 
-async function runTest(testName, testFunction) {
-  console.log(`\n>>> Iniciando Teste: ${testName} <<<`);
-  let logContent = `=== RELATÓRIO: ${testName} ===\n`;
-  logContent += `Data: ${new Date().toISOString()}\n`;
-  logContent += `Config: ${RUNS} execuções, ${WARMUP} warmups\n\n`;
-
-  process.stdout.write("Aquecendo (Warmup)... ");
-  for (let i = 0; i < WARMUP; i++) {
-    await testFunction(true);
-  }
-  console.log("OK.");
-
-  const times = [];
-  const mems = [];
-  console.log("Executando medições...");
-
-  for (let i = 0; i < RUNS; i++) {
-    process.stdout.write(`Execução ${i + 1}/${RUNS}... `);
-    const { duration, memDelta } = await testFunction(true);
-    times.push(duration);
-    mems.push(memDelta / 1024);
-    console.log(`${fmt(duration, 2)} ms | heap: ${fmt(memDelta / 1024, 2)} KB`);
-    logContent += `Run ${i + 1}: ${fmt(duration)} ms | heap delta: ${fmt(memDelta / 1024, 2)} KB\n`;
-  }
-
-  const timeStats = getStats(times);
-  const memStats = getStats(mems);
-
-  const resultSummary =
-    `\n--- RESULTADOS FINAIS (${testName}) ---\n` +
-    `[TEMPO]\n` +
-    `  Média:         ${timeStats.mean} ms\n` +
-    `  Desvio Padrão: ±${timeStats.stdDev} ms\n` +
-    `  Mínimo:        ${timeStats.min} ms\n` +
-    `  Máximo:        ${timeStats.max} ms\n` +
-    `[MEMÓRIA (heap delta)]\n` +
-    `  Média:         ${memStats.mean} KB\n` +
-    `  Desvio Padrão: ±${memStats.stdDev} KB\n` +
-    `  Mínimo:        ${memStats.min} KB\n` +
-    `  Máximo:        ${memStats.max} KB\n` +
-    `-----------------------------------\n\n`;
-
-  console.log(resultSummary);
-  logContent += resultSummary;
-
-  return logContent;
+function separator(char = '-', len = 72) {
+  return char.repeat(len) + '\n';
 }
 
 export async function main() {
-  fs.writeFileSync(
-    REPORT_FILE,
-    "RELATÓRIO DE PERFORMANCE - MEMÓRIA\n===================================\n\n" +
-    getSystemSpecs()
+  console.log(
+    '\n=== PROGRAMA MEMORY-BOUND: Inversão de Cores por Nível de Cache ===',
   );
+  console.log(`Config: ${RUNS} execuções por tamanho, ${WARMUP} warmup\n`);
 
-  try {
-    const invertResults = await runTest("Inversão de Cores", runInvertColors);
-    fs.appendFileSync(REPORT_FILE, invertResults);
+  let tableBody = '';
+  let detailsBlock = '';
+  const tableHeader =
+    `${'Tamanho'.padEnd(20)} | ${'CPU Médio'.padEnd(14)} | ${'Throughput Médio'.padEnd(17)} | ${'DP'.padEnd(12)} | ${'Mínimo'.padEnd(12)} | Máximo\n` +
+    separator('-');
 
-    console.log(`\n[SUCESSO] Relatório salvo em: ${REPORT_FILE}`);
-  } catch (error) {
-    console.error("Erro durante os testes:", error);
+  for (const sizeConfig of SIZES) {
+    console.log(`\n>>> ${sizeConfig.label} (${sizeConfig.reps} reps/run) <<<`);
+
+    process.stdout.write('  Warmup... ');
+    for (let i = 0; i < WARMUP; i++) runMemoryBound(sizeConfig);
+    console.log('OK.');
+
+    const throughputs = [];
+    const cpuTimes = [];
+    let runsDetail = '';
+
+    for (let i = 0; i < RUNS; i++) {
+      process.stdout.write(`  Run ${i + 1}/${RUNS}... `);
+      const { cpuTimeMs, throughputGBs } = runMemoryBound(sizeConfig);
+      throughputs.push(throughputGBs);
+      cpuTimes.push(cpuTimeMs);
+      console.log(`${fmt(throughputGBs)} GB/s  (${fmt(cpuTimeMs)} ms CPU)`);
+      runsDetail += `  Run ${i + 1}: ${fmt(cpuTimeMs)} ms (CPU) → ${fmt(throughputGBs)} GB/s\n`;
+    }
+
+    const st = getStats(throughputs);
+    const sc = getStats(cpuTimes);
+
+    tableBody +=
+      `${sizeConfig.label.padEnd(20)} | ` +
+      `${(fmt(sc.mean) + ' ms').padEnd(14)} | ` +
+      `${(fmt(st.mean) + ' GB/s').padEnd(17)} | ` +
+      `±${(fmt(st.stdDev) + ' GB/s').padEnd(11)} | ` +
+      `${(fmt(st.min) + ' GB/s').padEnd(12)} | ` +
+      `${fmt(st.max)} GB/s\n`;
+
+    detailsBlock +=
+      `\n--- ${sizeConfig.label.trim()} ---\n` +
+      runsDetail +
+      `[TEMPO DE CPU] Média: ${fmt(sc.mean)} ms  ±${fmt(sc.stdDev)} ms  Min: ${fmt(sc.min)} ms  Max: ${fmt(sc.max)} ms\n` +
+      `[THROUGHPUT]   Média: ${fmt(st.mean)} GB/s  ±${fmt(st.stdDev)} GB/s  Min: ${fmt(st.min)} GB/s  Max: ${fmt(st.max)} GB/s\n`;
   }
+
+  console.log('\n' + separator('='));
+  console.log('RESUMO — THROUGHPUT POR NÍVEL DE CACHE:');
+  console.log(separator('=') + tableHeader + tableBody);
+
+  const report =
+    `RELATÓRIO - PROGRAMA MEMORY-BOUND (Throughput de Memória)\n` +
+    `==========================================================\n\n` +
+    getSystemSpecs() +
+    `Config: ${RUNS} execuções por tamanho, ${WARMUP} warmup\n` +
+    `Método: inversão de cores (leitura + escrita do buffer inteiro)\n` +
+    `Ferramenta: process.cpuUsage() — tempo de CPU em modo usuário\n\n` +
+    separator('=') +
+    'DETALHES POR NÍVEL DE CACHE\n' +
+    separator('=') +
+    detailsBlock +
+    '\n' +
+    separator('=') +
+    'RESUMO — THROUGHPUT POR NÍVEL DE CACHE\n' +
+    separator('=') +
+    tableHeader +
+    tableBody +
+    separator('-');
+
+  fs.writeFileSync(REPORT_FILE, report);
+  console.log(`[SUCESSO] Relatório salvo em: ${REPORT_FILE}`);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
