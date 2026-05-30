@@ -8,20 +8,20 @@ Núcleos:   16 lógicos
 RAM Total: 15,35 GB
 =================================
 
-Imagem sintética: 2000x1500px, kernel 9x9
+Imagem sintética: 2000x1500px, kernel 21x21
 Kernel: 9x9, sigma=3
 Config: 5 execuções, 2 warmups
 Ferramenta: process.cpuUsage() — tempo de CPU em modo usuário
 
-Run 1: 1.506,3540 ms
-Run 2: 1.473,2900 ms
-Run 3: 1.600,6030 ms
-Run 4: 1.511,1280 ms
-Run 5: 1.436,7080 ms
+Run 1: 6.690,5850 ms
+Run 2: 6.743,4700 ms
+Run 3: 6.972,2300 ms
+Run 4: 6.121,8930 ms
+Run 5: 6.083,7530 ms
 --- RESULTADOS FINAIS ---
 [TEMPO DE CPU]
-  Média:         1.505,6166 ms
-  Desvio Padrão: ±54,4917 ms
-  Mínimo:        1.436,7080 ms
-  Máximo:        1.600,6030 ms
+  Média:         6.522,3862 ms
+  Desvio Padrão: ±355,6184 ms
+  Mínimo:        6.083,7530 ms
+  Máximo:        6.972,2300 ms
 -------------------------

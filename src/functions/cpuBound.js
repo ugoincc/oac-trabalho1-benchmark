@@ -3,8 +3,8 @@ import { applyConvolution } from './helpers/applyConvolution.js';
 
 const WIDTH = 2000;
 const HEIGHT = 1500;
-const KERNEL_SIZE = 9;
-const SIGMA = 3;
+const KERNEL_SIZE = 21;
+const SIGMA = 7;
 
 const KERNEL = generateGaussianKernel(KERNEL_SIZE, SIGMA);
 
